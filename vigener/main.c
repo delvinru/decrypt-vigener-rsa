@@ -53,25 +53,19 @@ void crypt(FILE *source, char* mode, char* key)
 		
 		char m;
 		int i = 0;
-		printf("Исходный файл:\n");
-		
 		while((m = getc(source)) != EOF)
 		{
-			//for output source text
-			printf("%c", m); 
-
 			if(m >= 97 && m <= 122)
 				m -= 32;
 			if(m >= 65 && m <= 90)
 			{
 				fprintf(encrypt, "%c", 65 + ( (m-65) + (key[i % key_len] - 65) )%N);
 				i++;
-			}else
+			} else
 				fprintf(encrypt, "%c", m);
 		}
 		fclose(encrypt);
 		printf("[+]Файл зашифрован!\n");
-		system("cat encrypt.txt");
 	}
 	//decrypt
 	if(strcmp(mode, "-d") == 0)
@@ -83,10 +77,8 @@ void crypt(FILE *source, char* mode, char* key)
 
 		char c;
 		int i = 0;
-		printf("Исходный файл\n");
 		while((c = getc(source)) != EOF)
 		{
-			printf("%c", c);
 			if(c >= 97 && c <= 122)
 				c -= 32;
 			if(c >= 65 && c <= 90)
@@ -98,7 +90,6 @@ void crypt(FILE *source, char* mode, char* key)
 		}
 		fclose(decrypt);
 		printf("[+]Файл расшифрован!\n");
-		system("cat decrypt.txt");
 	}
 }
 
