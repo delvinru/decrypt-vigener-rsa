@@ -1,2 +1,2 @@
 All:
-	gcc main.c -o main -Wall
+	gcc main.c -o vigener -Wall
