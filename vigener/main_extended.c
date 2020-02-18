@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <locale.h>
 
-//Размер английского алфавита
-#define N 26
-//Хочу сделать определение для кириллицы, т.е. через #define определить N = 33 и дальше от этого плясать
-
-void crypt(FILE *, char*, char*);
+void crypt(FILE *, wchar_t*, wchar_t*);
 void hack (FILE*);
 
-int main(const int argc, char** argv)
+int main(const int argc, wchar_t** argv)
 {
+	setlocale(LC_ALL, "ru_RU.UTF-8");
 	//user guide
 	if(argc < 3)
 	{
@@ -31,7 +30,7 @@ int main(const int argc, char** argv)
 	// Проверка на наличие ключа, т.к. от этого зависит будем ли мы просто шифровать/расшифровывать или взламывать текст
 	if(argv[4] != NULL)
 		crypt(source, argv[3], argv[5]);
-	if(argv[4] == NULL && strcmp(argv[3], "-d") == 0)
+	if(argv[4] == NULL && strcasecmp(argv[3], "-d") == 0)
 		hack(source);
 
 	fclose(source);
@@ -39,28 +38,46 @@ int main(const int argc, char** argv)
 }
 
 //Алгоритм шифровки и дешифровки
-void crypt(FILE *source, char* mode, char* key)
+void crypt(FILE *source, wchar_t* mode, wchar_t* key)
 {
 	//to upper text
+	for(int i = 0; i < strlen(key); i++)
+			if((key[i] >= 97 && key[i] <= 122) || (key[i] >= 1072 && key[i] <= 1103))
+				key[i] = (wchar_t)(key[i] - 32);
 	int key_len = strlen(key);
-	for(int i = 0; i < key_len; i++)
-			if(key[i] >= 97 && key[i] <= 122)
-				key[i] = (char)(key[i] - 32);
+	int N; //for eng
+	int shift;
+
+	//Определим язык, которым было зашифровано сообщение
+	//То это русский язык, а значит N = 33
+	wchar_t test_sym = key[0];
+	if(test_sym > 1039 || test_sym < 1104)
+	{
+		N = 32;
+		shift = 1040;
+	}
+	//Английский язык, а значит N = 26
+	if(test_sym > 64 && test_sym < 91)
+	{
+		N = 26;
+		shift = 65;
+	}
 	// Шифрование
-	if(strcmp(mode, "-e") == 0)
+	if(strcasecmp(mode, "-e") == 0)
 	{
 		FILE *encrypt;
 		encrypt = fopen("encrypt.txt", "w");
 
-		char m;
+		wchar_t m;
 		int i = 0;
 		while((m = getc(source)) != EOF)
 		{
-			if(m >= 97 && m <= 122)
+			// Превращение строчных букв в заглавные
+			if((m >= 97 && m <= 122) || (m >= 1072 && m <= 1103))
 				m -= 32;
-			if(m >= 65 && m <= 90)
+			if((m >= 65 && m <= 90) || (m >= 1040 && m <= 1071))
 			{
-				fprintf(encrypt, "%c", 65 + ( (m-65) + (key[i % key_len] - 65) )%N);
+				fprintf(encrypt, "%c", shift + ( (m-shift) + (key[i % key_len] - shift) )%N);
 				i++;
 			} else
 				fprintf(encrypt, "%c", m);
@@ -69,7 +86,7 @@ void crypt(FILE *source, char* mode, char* key)
 		printf("[+]Файл зашифрован!\n");
 	}
 	//decrypt
-	if(strcmp(mode, "-d") == 0)
+	if(strcasecmp(mode, "-d") == 0)
 	{
 		printf("%s\n", key);
 		printf("[+]Дешифруем текст с ключом\n");
@@ -80,9 +97,9 @@ void crypt(FILE *source, char* mode, char* key)
 		int i = 0;
 		while((c = getc(source)) != EOF)
 		{
-			if(c >= 97 && c <= 122)
+			if((m >= 97 && m <= 122) || (m >= 1072 && m <= 1103))
 				c -= 32;
-			if(c >= 65 && c <= 90)
+			if((m >= 65 && m <= 90) || (m >= 1040 && m <= 1071))
 			{
 				fprintf(decrypt, "%c", 65 + ( (c-65) + N - (key[i % key_len] - 65))%N );
 				i++;
