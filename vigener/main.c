@@ -6,15 +6,15 @@
 #define N 26
 //Хочу сделать определение для кириллицы, т.е. через #define определить N = 33 и дальше от этого плясать
 
-void crypt(FILE *, char*, char*);
-void hack (FILE*);
+void crypt  (FILE *, char*, char*);
+void attack (FILE*);
 
 int main(const int argc, char** argv)
 {
 	//user guide
 	if(argc < 3)
 	{
-		printf("./vigener -f source.txt -e/d -k key");
+		printf("./vigener -f source.txt -e/d -k key\n");
 		exit(1);
 	}
 
@@ -32,7 +32,7 @@ int main(const int argc, char** argv)
 	if(argv[4] != NULL)
 		crypt(source, argv[3], argv[5]);
 	if(argv[4] == NULL && strcmp(argv[3], "-d") == 0)
-		hack(source);
+		attack(source);
 
 	fclose(source);
 	return 0;
@@ -51,7 +51,6 @@ void crypt(FILE *source, char* mode, char* key)
 	{
 		FILE *encrypt;
 		encrypt = fopen("encrypt.txt", "w");
-
 		char m;
 		int i = 0;
 		while((m = getc(source)) != EOF)
@@ -84,7 +83,7 @@ void crypt(FILE *source, char* mode, char* key)
 				c -= 32;
 			if(c >= 65 && c <= 90)
 			{
-				fprintf(decrypt, "%c", 65 + ( (c-65) + N - (key[i % key_len] - 65))%N );
+				fprintf(decrypt, "%c", 65 + ( (c-65) + N - (key[i % key_len] - 65)) % N );
 				i++;
 			}else
 				fprintf(decrypt, "%c", c);
@@ -95,7 +94,7 @@ void crypt(FILE *source, char* mode, char* key)
 }
 
 // Нужно реализовать взлом шифра
-void hack(FILE* decrypt)
+void attack(FILE* decrypt)
 {
 	printf("дешифруем без ключа\n");
 }
