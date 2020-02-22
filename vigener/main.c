@@ -73,7 +73,10 @@ void crypt(FILE *source, char* mode, char* key)
 				i++;
 			}
 			else
+			{
 				fprintf(encrypt, "%c", m);
+				i++;
+			}
 		}
 		fclose(encrypt);
 		printf("[+]Файл зашифрован!\n");
@@ -98,7 +101,10 @@ void crypt(FILE *source, char* mode, char* key)
 				i++;
 			}
 			else
+			{
 				fprintf(decrypt, "%c", c);
+				i++;
+			}
 		}
 		fclose(decrypt);
 		printf("[+]Файл расшифрован!\n");
