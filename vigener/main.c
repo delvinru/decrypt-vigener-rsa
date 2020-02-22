@@ -4,9 +4,9 @@
 #include<malloc.h>
 
 
-//Размер английского алфавита
+//ГђГ Г§Г¬ГҐГ° Г Г­ГЈГ«ГЁГ©Г±ГЄГ®ГЈГ® Г Г«ГґГ ГўГЁГІГ 
 #define N 26
-//Хочу сделать определение для кириллицы, т.е. через #define определить N = 33 и дальше от этого плясать
+//Г•Г®Г·Гі Г±Г¤ГҐГ«Г ГІГј Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­ГЁГҐ Г¤Г«Гї ГЄГЁГ°ГЁГ«Г«ГЁГ¶Г», ГІ.ГҐ. Г·ГҐГ°ГҐГ§ #define Г®ГЇГ°ГҐГ¤ГҐГ«ГЁГІГј N = 33 ГЁ Г¤Г Г«ГјГёГҐ Г®ГІ ГЅГІГ®ГЈГ® ГЇГ«ГїГ±Г ГІГј
 
 void crypt(FILE *, char*, char*);
 void attack(FILE*);
@@ -16,6 +16,7 @@ void attack(FILE*);
 #define left_wall_fo_R 0.05
 #define right_wall_fo_E 0.07
 #define right_wall_fo_R 0.07
+
 int find_Key_lenth(FILE*, char mod, char** kod);
 
 
@@ -34,11 +35,11 @@ int main(const int argc, char** argv)
 
 	if (source == NULL)
 	{
-		printf("Файл нельзя открыть\n");
+		printf("Г”Г Г©Г« Г­ГҐГ«ГјГ§Гї Г®ГІГЄГ°Г»ГІГј\n");
 		exit(1);
 	}
 
-	// Проверка на наличие ключа, т.к. от этого зависит будем ли мы просто шифровать/расшифровывать или взламывать текст
+	// ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г  Г­Г Г«ГЁГ·ГЁГҐ ГЄГ«ГѕГ·Г , ГІ.ГЄ. Г®ГІ ГЅГІГ®ГЈГ® Г§Г ГўГЁГ±ГЁГІ ГЎГіГ¤ГҐГ¬ Г«ГЁ Г¬Г» ГЇГ°Г®Г±ГІГ® ГёГЁГґГ°Г®ГўГ ГІГј/Г°Г Г±ГёГЁГґГ°Г®ГўГ»ГўГ ГІГј ГЁГ«ГЁ ГўГ§Г«Г Г¬Г»ГўГ ГІГј ГІГҐГЄГ±ГІ
 	if (argv[4] != NULL)
 		crypt(source, argv[3], argv[5]);
 	if (argv[4] == NULL && strcmp(argv[3], "-d") == 0)
@@ -48,7 +49,7 @@ int main(const int argc, char** argv)
 	return 0;
 }
 
-//Алгоритм шифровки и дешифровки
+//ГЂГ«ГЈГ®Г°ГЁГІГ¬ ГёГЁГґГ°Г®ГўГЄГЁ ГЁ Г¤ГҐГёГЁГґГ°Г®ГўГЄГЁ
 void crypt(FILE *source, char* mode, char* key)
 {
 	//to upper text
@@ -56,7 +57,7 @@ void crypt(FILE *source, char* mode, char* key)
 	for (int i = 0; i < key_len; i++)
 		if (key[i] >= 97 && key[i] <= 122)
 			key[i] = (char)(key[i] - 32);
-	// Шифрование
+	// ГГЁГґГ°Г®ГўГ Г­ГЁГҐ
 	if (strcmp(mode, "-e") == 0)
 	{
 		FILE *encrypt;
@@ -76,13 +77,13 @@ void crypt(FILE *source, char* mode, char* key)
 				fprintf(encrypt, "%c", m);
 		}
 		fclose(encrypt);
-		printf("[+]Файл зашифрован!\n");
+		printf("[+]Г”Г Г©Г« Г§Г ГёГЁГґГ°Г®ГўГ Г­!\n");
 	}
 	//decrypt
 	if (strcmp(mode, "-d") == 0)
 	{
 		printf("%s\n", key);
-		printf("[+]Дешифруем текст с ключом\n");
+		printf("[+]Г„ГҐГёГЁГґГ°ГіГҐГ¬ ГІГҐГЄГ±ГІ Г± ГЄГ«ГѕГ·Г®Г¬\n");
 		FILE *decrypt;
 		decrypt = fopen("decrypt.txt", "w");
 
@@ -101,19 +102,19 @@ void crypt(FILE *source, char* mode, char* key)
 				fprintf(decrypt, "%c", c);
 		}
 		fclose(decrypt);
-		printf("[+]Файл расшифрован!\n");
+		printf("[+]Г”Г Г©Г« Г°Г Г±ГёГЁГґГ°Г®ГўГ Г­!\n");
 	}
 }
 
-// Нужно реализовать взлом шифра
+// ГЌГіГ¦Г­Г® Г°ГҐГ Г«ГЁГ§Г®ГўГ ГІГј ГўГ§Г«Г®Г¬ ГёГЁГґГ°Г 
 void attack(FILE* f)
 {
-	printf("дешифруем без ключа\n");
+	printf("Г¤ГҐГёГЁГґГ°ГіГҐГ¬ ГЎГҐГ§ ГЄГ«ГѕГ·Г \n");
 	unsigned char mod = 0;
 	int lenht_alf = 0;
 	int otclonenie_table = 0;
 
-	//разбераемся с алфавитом(только заглавные)
+	//Г°Г Г§ГЎГҐГ°Г ГҐГ¬Г±Гї Г± Г Г«ГґГ ГўГЁГІГ®Г¬(ГІГ®Г«ГјГЄГ® Г§Г ГЈГ«Г ГўГ­Г»ГҐ)
 	while (!mod && !feof(f))
 	{
 		if ((mod = (unsigned char)fgetc(f)) <= 90 && mod >= 65)mod = 'e';
@@ -134,11 +135,11 @@ void attack(FILE* f)
 	}
 	if (mod == 0)
 	{
-		printf("Файл пуст\n");
+		printf("Г”Г Г©Г« ГЇГіГ±ГІ\n");
 		return;
 	}
 
-	//найдем длину ключа
+	//Г­Г Г©Г¤ГҐГ¬ Г¤Г«ГЁГ­Гі ГЄГ«ГѕГ·Г 
 	int len_key = 0;
 	char* kod = 0;
 	len_key = find_Key_lenth(f, mod, &kod);
@@ -146,7 +147,7 @@ void attack(FILE* f)
 
 
 
-	//масив для кол-ва символов
+	//Г¬Г Г±ГЁГў Г¤Г«Гї ГЄГ®Г«-ГўГ  Г±ГЁГ¬ГўГ®Г«Г®Гў
 	int**kol_vo_simbols = 0;
 	kol_vo_simbols = (int**)malloc(sizeof(int*)*lenht_alf);
 	for (int i = 0; i < lenht_alf; i++)
@@ -157,7 +158,7 @@ void attack(FILE* f)
 			kol_vo_simbols[i][j] = 0;
 		}
 	}
-	//масив кол-ва знаков на каждую букву ключа
+	//Г¬Г Г±ГЁГў ГЄГ®Г«-ГўГ  Г§Г­Г ГЄГ®Гў Г­Г  ГЄГ Г¦Г¤ГіГѕ ГЎГіГЄГўГі ГЄГ«ГѕГ·Г 
 	int*kol_vo = 0;
 	kol_vo = (int*)calloc(sizeof(int)*len_key, sizeof(int)*len_key);
 
@@ -187,7 +188,7 @@ void attack(FILE* f)
 	//	printf("%i ", kol_vo[f]);
 	//	printf("\n ");
 	//}
-		//масив для отклонений
+		//Г¬Г Г±ГЁГў Г¤Г«Гї Г®ГІГЄГ«Г®Г­ГҐГ­ГЁГ©
 	double**otklonenie = 0;
 	otklonenie = (double**)malloc(sizeof(double*)*lenht_alf);
 	for (int i = 0; i < lenht_alf; i++)
@@ -198,7 +199,7 @@ void attack(FILE* f)
 			otklonenie[i][j] = 0;
 		}
 	}
-	//масив для peзультирующих отклонений
+	//Г¬Г Г±ГЁГў Г¤Г«Гї peГ§ГіГ«ГјГІГЁГ°ГіГѕГ№ГЁГµ Г®ГІГЄГ«Г®Г­ГҐГ­ГЁГ©
 	int*otklonenie_REZ = 0;
 	otklonenie_REZ = (int*)malloc(sizeof(int)*(len_key - 1));
 	double MAX_otklonenie = 0;
@@ -232,7 +233,7 @@ void attack(FILE* f)
 	//printf("%i ", otklonenie_REZ[1]);
 	//printf("%i ", otklonenie_REZ[2]);
 
-	printf("Выбири возможный ключ\n");
+	printf("Г‚Г»ГЎГЁГ°ГЁ ГўГ®Г§Г¬Г®Г¦Г­Г»Г© ГЄГ«ГѕГ·\n");
 	for (int i = 0; i < lenht_alf; i++)
 	{
 		printf("%i - %c", i, i + otclonenie_table);
@@ -264,11 +265,11 @@ void attack(FILE* f)
 
 int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 {
-	//узнаём размер файла
+	//ГіГ§Г­Г ВёГ¬ Г°Г Г§Г¬ГҐГ° ГґГ Г©Г«Г 
 	fseek(file, 0, SEEK_END);
 	int lenth_kod = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	//вводим его
+	//ГўГўГ®Г¤ГЁГ¬ ГҐГЈГ®
 	*kod = (char*)calloc((lenth_kod + 2) * sizeof(char), (lenth_kod + 2) * sizeof(char));
 
 	fread(*kod, sizeof(char), lenth_kod, file);
@@ -280,27 +281,27 @@ int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 	double index_covpadeniu = 0;
 	int otclonenie_table = 0;
 	int* kol_vo_simbols = 0;
-	//разбераемся с алфавитом
-	if (mod == 'r') {//русский
+	//Г°Г Г§ГЎГҐГ°Г ГҐГ¬Г±Гї Г± Г Г«ГґГ ГўГЁГІГ®Г¬
+	if (mod == 'r') {//Г°ГіГ±Г±ГЄГЁГ©
 		otclonenie_table = 192;
 		lenth_alf = 33;
 	}
-	else if (mod == 'e') {//англ
+	else if (mod == 'e') {//Г Г­ГЈГ«
 		otclonenie_table = 65;
 		lenth_alf = 26;
 	}
 	else
-		return 0;//в случае если,что-то пошло не так с алфавитом
-	//масив для кол-ва символов
+		return 0;//Гў Г±Г«ГіГ·Г ГҐ ГҐГ±Г«ГЁ,Г·ГІГ®-ГІГ® ГЇГ®ГёГ«Г® Г­ГҐ ГІГ ГЄ Г± Г Г«ГґГ ГўГЁГІГ®Г¬
+	//Г¬Г Г±ГЁГў Г¤Г«Гї ГЄГ®Г«-ГўГ  Г±ГЁГ¬ГўГ®Г«Г®Гў
 	kol_vo_simbols = (int*)malloc(lenth_alf * sizeof(int));
 
-	//считам спецсимволы
+	//Г±Г·ГЁГІГ Г¬ Г±ГЇГҐГ¶Г±ГЁГ¬ГўГ®Г«Г»
 	for (int i = 0; i < lenth_kod; i++)
 	{
 		if (!((unsigned char)(*kod)[i] >= otclonenie_table && (unsigned char)(*kod)[i] <= otclonenie_table + lenth_alf || (unsigned char)(*kod)[i] == 168))otclonenie++;
 	}
 
-	//магия
+	//Г¬Г ГЈГЁГї
 	for (int i = 2; i < lenth_kod; i++)
 	{
 		for (int f = 0; f < i; f++)
@@ -330,13 +331,13 @@ int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 					if (proverka)proverka--;
 					MAX_index_covpadeniu = index_covpadeniu;
 				}
-				if ((i % smeshenie) == 0)MAX_index_covpadeniu *= 1.06;//это фокус
-				//можно вставить красивый вывод
+				if ((i % smeshenie) == 0)MAX_index_covpadeniu *= 1.06;//ГЅГІГ® ГґГ®ГЄГіГ±
+				//Г¬Г®Г¦Г­Г® ГўГ±ГІГ ГўГЁГІГј ГЄГ°Г Г±ГЁГўГ»Г© ГўГ»ГўГ®Г¤
 			}
 		}
 	}
 	free(kol_vo_simbols);
-	//выводим значение
+	//ГўГ»ГўГ®Г¤ГЁГ¬ Г§Г­Г Г·ГҐГ­ГЁГҐ
 	return smeshenie;
 }
 
