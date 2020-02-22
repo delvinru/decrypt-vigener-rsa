@@ -4,9 +4,9 @@
 #include<malloc.h>
 
 
-//Ðàçìåð àíãëèéñêîãî àëôàâèòà
+//Размер английского алфавита
 #define N 26
-//Õî÷ó ñäåëàòü îïðåäåëåíèå äëÿ êèðèëëèöû, ò.å. ÷åðåç #define îïðåäåëèòü N = 33 è äàëüøå îò ýòîãî ïëÿñàòü
+//Хочу сделать определение для кириллицы, т.е. через #define определить N = 33 и дальше от этого плясать
 
 void crypt(FILE *, char*, char*);
 void attack(FILE*);
@@ -16,7 +16,6 @@ void attack(FILE*);
 #define left_wall_fo_R 0.05
 #define right_wall_fo_E 0.07
 #define right_wall_fo_R 0.07
-
 int find_Key_lenth(FILE*, char mod, char** kod);
 
 
@@ -35,11 +34,11 @@ int main(const int argc, char** argv)
 
 	if (source == NULL)
 	{
-		printf("Ôàéë íåëüçÿ îòêðûòü\n");
+		printf("Файл нельзя открыть\n");
 		exit(1);
 	}
 
-	// Ïðîâåðêà íà íàëè÷èå êëþ÷à, ò.ê. îò ýòîãî çàâèñèò áóäåì ëè ìû ïðîñòî øèôðîâàòü/ðàñøèôðîâûâàòü èëè âçëàìûâàòü òåêñò
+	// Проверка на наличие ключа, т.к. от этого зависит будем ли мы просто шифровать/расшифровывать или взламывать текст
 	if (argv[4] != NULL)
 		crypt(source, argv[3], argv[5]);
 	if (argv[4] == NULL && strcmp(argv[3], "-d") == 0)
@@ -49,7 +48,7 @@ int main(const int argc, char** argv)
 	return 0;
 }
 
-//Àëãîðèòì øèôðîâêè è äåøèôðîâêè
+//Алгоритм шифровки и дешифровки
 void crypt(FILE *source, char* mode, char* key)
 {
 	//to upper text
@@ -57,7 +56,7 @@ void crypt(FILE *source, char* mode, char* key)
 	for (int i = 0; i < key_len; i++)
 		if (key[i] >= 97 && key[i] <= 122)
 			key[i] = (char)(key[i] - 32);
-	// Øèôðîâàíèå
+	// Шифрование
 	if (strcmp(mode, "-e") == 0)
 	{
 		FILE *encrypt;
@@ -77,13 +76,13 @@ void crypt(FILE *source, char* mode, char* key)
 				fprintf(encrypt, "%c", m);
 		}
 		fclose(encrypt);
-		printf("[+]Ôàéë çàøèôðîâàí!\n");
+		printf("[+]Файл зашифрован!\n");
 	}
 	//decrypt
 	if (strcmp(mode, "-d") == 0)
 	{
 		printf("%s\n", key);
-		printf("[+]Äåøèôðóåì òåêñò ñ êëþ÷îì\n");
+		printf("[+]Дешифруем текст с ключом\n");
 		FILE *decrypt;
 		decrypt = fopen("decrypt.txt", "w");
 
@@ -102,19 +101,19 @@ void crypt(FILE *source, char* mode, char* key)
 				fprintf(decrypt, "%c", c);
 		}
 		fclose(decrypt);
-		printf("[+]Ôàéë ðàñøèôðîâàí!\n");
+		printf("[+]Файл расшифрован!\n");
 	}
 }
 
-// Íóæíî ðåàëèçîâàòü âçëîì øèôðà
+// Нужно реализовать взлом шифра
 void attack(FILE* f)
 {
-	printf("äåøèôðóåì áåç êëþ÷à\n");
+	printf("дешифруем без ключа\n");
 	unsigned char mod = 0;
 	int lenht_alf = 0;
 	int otclonenie_table = 0;
 
-	//ðàçáåðàåìñÿ ñ àëôàâèòîì(òîëüêî çàãëàâíûå)
+	//разбераемся с алфавитом(только заглавные)
 	while (!mod && !feof(f))
 	{
 		if ((mod = (unsigned char)fgetc(f)) <= 90 && mod >= 65)mod = 'e';
@@ -135,11 +134,11 @@ void attack(FILE* f)
 	}
 	if (mod == 0)
 	{
-		printf("Ôàéë ïóñò\n");
+		printf("Файл пуст\n");
 		return;
 	}
 
-	//íàéäåì äëèíó êëþ÷à
+	//найдем длину ключа
 	int len_key = 0;
 	char* kod = 0;
 	len_key = find_Key_lenth(f, mod, &kod);
@@ -147,7 +146,7 @@ void attack(FILE* f)
 
 
 
-	//ìàñèâ äëÿ êîë-âà ñèìâîëîâ
+	//масив для кол-ва символов
 	int**kol_vo_simbols = 0;
 	kol_vo_simbols = (int**)malloc(sizeof(int*)*lenht_alf);
 	for (int i = 0; i < lenht_alf; i++)
@@ -158,7 +157,7 @@ void attack(FILE* f)
 			kol_vo_simbols[i][j] = 0;
 		}
 	}
-	//ìàñèâ êîë-âà çíàêîâ íà êàæäóþ áóêâó êëþ÷à
+	//масив кол-ва знаков на каждую букву ключа
 	int*kol_vo = 0;
 	kol_vo = (int*)calloc(sizeof(int)*len_key, sizeof(int)*len_key);
 
@@ -188,7 +187,7 @@ void attack(FILE* f)
 	//	printf("%i ", kol_vo[f]);
 	//	printf("\n ");
 	//}
-		//ìàñèâ äëÿ îòêëîíåíèé
+		//масив для отклонений
 	double**otklonenie = 0;
 	otklonenie = (double**)malloc(sizeof(double*)*lenht_alf);
 	for (int i = 0; i < lenht_alf; i++)
@@ -199,7 +198,7 @@ void attack(FILE* f)
 			otklonenie[i][j] = 0;
 		}
 	}
-	//ìàñèâ äëÿ peçóëüòèðóþùèõ îòêëîíåíèé
+	//масив для peзультирующих отклонений
 	int*otklonenie_REZ = 0;
 	otklonenie_REZ = (int*)malloc(sizeof(int)*(len_key - 1));
 	double MAX_otklonenie = 0;
@@ -233,7 +232,7 @@ void attack(FILE* f)
 	//printf("%i ", otklonenie_REZ[1]);
 	//printf("%i ", otklonenie_REZ[2]);
 
-	printf("Âûáèðè âîçìîæíûé êëþ÷\n");
+	printf("Выбири возможный ключ\n");
 	for (int i = 0; i < lenht_alf; i++)
 	{
 		printf("%i - %c", i, i + otclonenie_table);
@@ -265,11 +264,11 @@ void attack(FILE* f)
 
 int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 {
-	//óçíà¸ì ðàçìåð ôàéëà
+	//узнаём размер файла
 	fseek(file, 0, SEEK_END);
 	int lenth_kod = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	//ââîäèì åãî
+	//вводим его
 	*kod = (char*)calloc((lenth_kod + 2) * sizeof(char), (lenth_kod + 2) * sizeof(char));
 
 	fread(*kod, sizeof(char), lenth_kod, file);
@@ -281,27 +280,27 @@ int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 	double index_covpadeniu = 0;
 	int otclonenie_table = 0;
 	int* kol_vo_simbols = 0;
-	//ðàçáåðàåìñÿ ñ àëôàâèòîì
-	if (mod == 'r') {//ðóññêèé
+	//разбераемся с алфавитом
+	if (mod == 'r') {//русский
 		otclonenie_table = 192;
 		lenth_alf = 33;
 	}
-	else if (mod == 'e') {//àíãë
+	else if (mod == 'e') {//англ
 		otclonenie_table = 65;
 		lenth_alf = 26;
 	}
 	else
-		return 0;//â ñëó÷àå åñëè,÷òî-òî ïîøëî íå òàê ñ àëôàâèòîì
-	//ìàñèâ äëÿ êîë-âà ñèìâîëîâ
+		return 0;//в случае если,что-то пошло не так с алфавитом
+	//масив для кол-ва символов
 	kol_vo_simbols = (int*)malloc(lenth_alf * sizeof(int));
 
-	//ñ÷èòàì ñïåöñèìâîëû
+	//считам спецсимволы
 	for (int i = 0; i < lenth_kod; i++)
 	{
 		if (!((unsigned char)(*kod)[i] >= otclonenie_table && (unsigned char)(*kod)[i] <= otclonenie_table + lenth_alf || (unsigned char)(*kod)[i] == 168))otclonenie++;
 	}
 
-	//ìàãèÿ
+	//магия
 	for (int i = 2; i < lenth_kod; i++)
 	{
 		for (int f = 0; f < i; f++)
@@ -331,13 +330,13 @@ int find_Key_lenth(FILE* file, char mod, char** kod)// mod={r,e}
 					if (proverka)proverka--;
 					MAX_index_covpadeniu = index_covpadeniu;
 				}
-				if ((i % smeshenie) == 0)MAX_index_covpadeniu *= 1.06;//ýòî ôîêóñ
-				//ìîæíî âñòàâèòü êðàñèâûé âûâîä
+				if ((i % smeshenie) == 0)MAX_index_covpadeniu *= 1.06;//это фокус
+				//можно вставить красивый вывод
 			}
 		}
 	}
 	free(kol_vo_simbols);
-	//âûâîäèì çíà÷åíèå
+	//выводим значение
 	return smeshenie;
 }
 
