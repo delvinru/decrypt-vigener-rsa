@@ -59,8 +59,8 @@ optional arguments:
 ### Ubuntu 19.04 install instruction
 ```bash
 git clone https://github.com/delvinru/decrypt-vigener-rsa.git
+cd decrypt-vigener-rsa/rsa
 pip3 install -r "reqiremenets.txt"
-cd rsa/
 python3 RsaTool.py
 ```
 ---
