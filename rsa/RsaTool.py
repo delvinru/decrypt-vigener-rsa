@@ -181,13 +181,13 @@ if __name__ == "__main__":
 		version="%(prog)s (version 0.1)",
 		help="show program version"
 	)
-	# Read arguments from the command line
-	args = parser.parse_args()
-
+	
 	if len(sys.argv) == 1:
 		parser.print_help()
 		sys.exit(1)
 
+	# Read arguments from the command line
+	args = parser.parse_args()
 
 	if args.pdf is not None:
 		args.n, args.e, args.istr = parse_pdf(args.pdf)
