@@ -56,11 +56,11 @@ optional arguments:
 - Argparse
 - PyPDF2
 ---
-### Ubuntu 19.04 install instruction
+### Ubuntu 19.10 install instruction
 ```bash
 git clone https://github.com/delvinru/decrypt-vigener-rsa.git
 cd decrypt-vigener-rsa/rsa
-pip3 install -r "reqiremenets.txt"
+pip3 install -r requirements.txt
 python3 RsaTool.py
 ```
 ---
