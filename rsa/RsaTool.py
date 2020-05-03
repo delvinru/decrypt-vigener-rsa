@@ -8,12 +8,9 @@ from lib.attack import *
 def encrypt(args):
 	print("[+] Encrypt file started")
 
-	# compute modulus n
-	args.n = args.p * args.q
-
+	uncipher = []
 	# open input file
 	if args.istr is None:
-		uncipher = []
 		try:
 			with open(args.ifile, "rb") as src:
 				uncipher.append(src.readlines())
@@ -21,17 +18,34 @@ def encrypt(args):
 			print(f"[-] File {args.ifile} not found or can't be read")
 			exit(0)
 		args.istr = uncipher
-	
+	else:
+		uncipher.append(args.istr.encode("utf-8"))
+		args.istr = uncipher
+
+	# Convert message to number
 	args.istr = [s2n(m) for m in args.istr]
+
+	# compute modulus n
+	args.n = args.p * args.q
+	print(f"[+] Use n: {args.n}")
 
 	# Calculate Euler function
 	phi = (args.p - 1)*(args.q - 1)
-	
+
+	# Choose e if is None
+	if args.e is None:
+		elist = [0x10001, 0x101, 0x11]
+		for el in elist:
+			if el < phi:
+				args.e = el
+				break
+	print(f"[+] Use e: {args.e}")
+
 	# Calculate secret exponent
 	d = inverse(args.e, phi)
 
-	# Calculate cipher text/textx
-	cipher = [hex(pow(m, e, d)) for m in args.istr]
+	# Calculate cipher text/texts
+	cipher = [hex(pow(m, args.e, args.n)) for m in args.istr]
 	print("[+] ...")
 	
 	try:
@@ -40,7 +54,7 @@ def encrypt(args):
 			os.mkdir(path)
 
 		with open(os.path.join(path, args.ofile), "w") as out:
-			out.write(hex("\n".join(cipher)))
+			out.write("\n".join(cipher))
 
 		with open(os.path.join(path, "key.pub"), "w") as out:
 			out.write(f"e:{args.e}\nn:{args.n}")
@@ -56,17 +70,26 @@ def encrypt(args):
 	print("[+] Cipher: " + " ".join(cipher))
 
 def decrypt(args):
+	if args.e is None:
+		print("[!] Plz enter 'e'")
+		exit(0)
+
 	print("[+] Decrypt started")
 	if args.n is None:
 		args.n = args.p * args.q
 
+	cipher = []
+
 	if args.istr is None:
 		try:
 			with open(args.ifile, "r") as src:
-				args.istr = src.readlines()
+				cipher = src.readlines()
 		except OSError:
 			print(f"[-] File {args.ifile} not found or can't be read")
-			exit(0)
+		args.istr = cipher
+	else:
+		cipher.append(args.istr)
+		args.istr = cipher
 
 	# Calculate necessary components
 	print("[+] ...")
@@ -75,7 +98,9 @@ def decrypt(args):
 
 	# message in int type
 	message = [pow(get_num(c), d, args.n) for c in args.istr]
-	message = [n2s(m).decode("utf-8") for m in message]
+
+	message = [str(n2s(m)) for m in message]
+
 	try:
 		path = "decrypt_result"
 		if not os.path.exists(path):
@@ -85,7 +110,7 @@ def decrypt(args):
 			out.write("".join(message))
 		
 		print(f"[+] Decrypt complete. Check folder: {path}/")
-		print(f"[+] p: {args.p}\n[+] q: {args.q}")
+		print(f"[+] p: {args.p}\n[+] q: {args.q}\n[+] d: {d}")
 		print(f"[+] Message: " + "".join(message))
 	except OSError:
 		print(f"[-] File {arg.ofile} not found or can't be read")
@@ -112,9 +137,7 @@ def main(args):
 		attack(args)
 
 if __name__ == "__main__":
-	if sys.version_info[0] < 3:
-		raise Exception("Python version higher than 3.7 is required")
-
+	
 	# Initiate parser
 	desc = "This program was developed by students of the KKSO-01-19 group.\nKolesnikov Alexey - main developer\nKazarin Anton - contributor"
 	parser = argparse.ArgumentParser(epilog=desc, formatter_class=argparse.RawTextHelpFormatter)
@@ -157,18 +180,20 @@ if __name__ == "__main__":
 	parser.add_argument(
 		"-if", "--ifile", 
 		metavar="<input file>",
+		type=str,
 		help="input file with text"
 	)
 	parser.add_argument(
 		"-is", "--istr",
 		metavar="<str>",
+		type=str,
 		help="input text without file"
 	)
 	parser.add_argument(
 		"-of", "--ofile", 
 		default="out.txt",
 		metavar="<output file>",
-		help="input file for encrypt/decrypt message"
+		help="input file for encrypt/decrypt message (default: %(default)s)"
 	)
 	parser.add_argument(
 		"--pdf",
@@ -184,7 +209,7 @@ if __name__ == "__main__":
 	
 	if len(sys.argv) == 1:
 		parser.print_help()
-		sys.exit(1)
+		exit(0)
 
 	# Read arguments from the command line
 	args = parser.parse_args()
