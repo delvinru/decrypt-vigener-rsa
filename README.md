@@ -25,7 +25,7 @@ optional arguments:
   -is <str>, --istr <str>
                         input text without file
   -of <output file>, --ofile <output file>
-                        input file for encrypt/decrypt message
+                        input file for encrypt/decrypt message (default: out.txt)
   --pdf <file>          extract all information from PDF file
   -v, --version         show program version
 ```
