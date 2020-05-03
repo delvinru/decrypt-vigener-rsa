@@ -38,7 +38,7 @@ optional arguments:
 
 ### Example:
 1. Traditional
-	`./RsaTool.py -m enc -p 61 -q 53 -is "secret"`
+	`./RsaTool.py -m enc -p 1030330938209 -q 1759217765581 -is "secret"`
 
 2. You can specify attack method and input encrypted message
 	When you specify `--attack` you should not use `-m {enc, dec}`
