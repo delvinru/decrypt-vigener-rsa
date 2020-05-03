@@ -87,7 +87,7 @@ def decrypt(args):
 		except OSError:
 			print(f"[-] File {args.ifile} not found or can't be read")
 		args.istr = cipher
-	else:
+	elif not isinstance(args.istr, list):
 		cipher.append(args.istr)
 		args.istr = cipher
 
@@ -99,7 +99,7 @@ def decrypt(args):
 	# message in int type
 	message = [pow(get_num(c), d, args.n) for c in args.istr]
 
-	message = [str(n2s(m)) for m in message]
+	message = [n2s(m).decode("utf-8") for m in message]
 
 	try:
 		path = "decrypt_result"
